@@ -49,6 +49,7 @@ module.exports.update = (req, res) => {
 } 
 
 module.exports.delete = (req, res) => {
+    console.log("Test")
     if (!req.body) {
         res.status(400).send({ message: 'Bad request' })
     }
