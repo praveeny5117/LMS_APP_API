@@ -25,6 +25,7 @@ app.use(express.json())
 app.use(express.urlencoded({extended:true}))
 
 app.use('/',require('./router/router'))
+app.use('/onboard',require('./router/onBoard_router'))
 
 
 app.listen(PORT,()=>{console.log(`Server running PORT => ${PORT}`);}) 
