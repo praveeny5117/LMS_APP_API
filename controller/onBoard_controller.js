@@ -8,12 +8,21 @@ module.exports.addEmployee = (req, res) => {
     req.body.updatedAt= new Date()
 
     const employee = new Employee(req.body)
-console.log(req.body)
     employee.save().then(data => {
         res.send(data);
     })
         .catch(err => {
             console.log(err)
+            res.status(500).send({ message: err.message })
+        })
+}
+
+
+module.exports.getEmployee = (req, res) => {
+    Employee.find().then(data => {
+        res.status(200).send(data)
+    })
+        .catch(err => {
             res.status(500).send({ message: err.message })
         })
 }

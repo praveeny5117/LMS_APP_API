@@ -9,6 +9,16 @@ var schema = new mongoose.Schema({
         type:String,
         required:true
     },
+    empDesignation:{
+        type:String,
+        required:true
+    },
+     role:{
+        type:String,
+        required:true,
+        enum:['user','admin'],
+        default:'user'
+    },
     empEmail:{
         type:String,
         required:true
@@ -47,7 +57,8 @@ var schema = new mongoose.Schema({
     },
     status:{
         type:String,
-        required:false,
+        required:true,
+        enum:['A','I'],
         default:'A'
     },
     createdAt:{
