@@ -63,7 +63,7 @@ var schema = new mongoose.Schema({
         type:String,
         required:true,
         enum:['A','I'],
-        default:'A'
+        default:'I'
     },
     createdAt:{
         type:Date,

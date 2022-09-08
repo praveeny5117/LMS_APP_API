@@ -37,3 +37,16 @@ module.exports.findOne = (query = {}, fields = {  }) => {
             });
     });
 };
+
+
+module.exports.updateOne = (query = {}, record = {}) => {
+    return new bluebird((resolve, reject) => {
+        employee.updateOne(query, { $set: record })
+            .exec((err, doc) => {
+                if (err)
+                    reject(err);
+                else
+                    resolve(doc);
+            });
+    });
+};

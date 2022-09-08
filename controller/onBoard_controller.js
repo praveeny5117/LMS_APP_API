@@ -1,11 +1,17 @@
 const employeeService = require('../service/onBoard_service')
+const bcrypt = require("bcrypt");
+const jwt = require('jsonwebtoken');
+const dotenv = require('dotenv').config()
 
 module.exports.addEmployee = async (req, res) => {
     try {
         if (!req.body) {
             res.status(400).send({ message: 'Bad request' })
         }
-        req.body.password = "Lms@123"
+        let userCode = "Test@123"
+        // let userCode = Math.floor(100000 + Math.random() * 900000)
+        const salt = await bcrypt.genSalt(10);
+        req.body.password = await bcrypt.hash(userCode, salt);
         req.body.createdAt = new Date();
         req.body.updatedAt = new Date()
 
@@ -23,14 +29,73 @@ module.exports.addEmployee = async (req, res) => {
     }
 }
 
-module.exports.login = async (req, res) =>{
+module.exports.login = async (req, res) => {
     try {
-        let employeeData = await employeeService.findOne({email:req.body.email});
-        if(employeeData.password == req.body.password)
-        res.send({message:'Logged in Successfully'})
+        let employeeData = await employeeService.findOne({ empEmail: req.body.email });
+        if (employeeData !== null) {
+            if (employeeData.status == 'A') {
+                if (await bcrypt.compare(req.body.password, employeeData.password)) {
+                    console.log(generateToken(employeeData))
+                    res.status(200).send({ message: 'Logged in Successfully' })
+                } else {
+                    res.status(400).send({ message: 'Incorrect password' })
+                }
+            } else {
+                res.send({ message: "Account not activated Please activate your account" })
+            }
+        } else {
+            res.status(400).send({ message: 'Email Not exist' })
+        }
+    } catch (error) {
+        console.log(error)
+        if (error.name === "ValidationError")
+            return res.status(500).send(error);
         else
-        res.send({message:'Incorrect password'})
-    
+            return res.status(500).send(error);
+    }
+}
+
+
+module.exports.codeCheck = async (req, res) => {
+    try {
+        let employeeData = await employeeService.findOne({ empEmail: req.body.email });
+        if (employeeData !== null) {
+            if (employeeData.status == 'I') {
+                if (await bcrypt.compare(req.body.password, employeeData.password)) {
+                    res.status(200).send({ message: 'Correct Code' })
+                } else {
+                    res.status(400).send({ message: 'Incorrect Code' })
+                }
+            }
+        } else {
+            res.status(400).send({ message: 'Email Not exist' })
+        }
+    } catch (error) {
+        console.log(error)
+        if (error.name === "ValidationError")
+            return res.status(500).send(error);
+        else
+            return res.status(500).send(error);
+    }
+}
+
+module.exports.resetPassword = async (req, res) => {
+    try {
+        let employeeData = await employeeService.findOne({ empEmail: req.body.email });
+        if (employeeData !== null) {
+            if (employeeData.status == 'I') {
+                let activateData = await employeeService.updateOne({
+                    empEmail: req.body.email
+                }, { password: req.body.password })
+                if (activateData.modifiedCount)
+                    res.status(200).send({ message: "Account Activated Successfully" })
+                else {
+                    res.status(400).send({ message: 'Please enter new password' })
+                }
+            }
+        } else {
+            res.status(400).send({ message: 'Email Not exist' })
+        }
     } catch (error) {
         console.log(error)
         if (error.name === "ValidationError")
@@ -43,9 +108,9 @@ module.exports.login = async (req, res) =>{
 module.exports.getEmployee = async (req, res) => {
     try {
         let employeeData = await employeeService.find();
-        if (employeeData.length){
+        if (employeeData.length) {
             res.status(200).send(employeeData)
-        }else
+        } else
             res.status(204).send()
     } catch (error) {
         if (error.name === "ValidationError")
@@ -53,4 +118,13 @@ module.exports.getEmployee = async (req, res) => {
         else
             return res.status(500).send(error);
     }
+}
+
+function generateToken(input){
+    let jwtSecretKey = process.env.JWT_SECRET_KEY;
+    let data = {
+        time: Date(),
+        userId: input.empID,
+    }
+    return jwt.sign(data, jwtSecretKey);
 }
