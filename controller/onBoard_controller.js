@@ -1,4 +1,5 @@
 const employeeService = require('../service/onBoard_service')
+const tokenService = require('../service/token')
 const bcrypt = require("bcrypt");
 const jwt = require('jsonwebtoken');
 const dotenv = require('dotenv').config()
@@ -9,7 +10,6 @@ module.exports.addEmployee = async (req, res) => {
             res.status(400).send({ message: 'Bad request' })
         }
         let userCode = "Test@123"
-        // let userCode = Math.floor(100000 + Math.random() * 900000)
         const salt = await bcrypt.genSalt(10);
         req.body.password = await bcrypt.hash(userCode, salt);
         req.body.createdAt = new Date();
@@ -35,8 +35,16 @@ module.exports.login = async (req, res) => {
         if (employeeData !== null) {
             if (employeeData.status == 'A') {
                 if (await bcrypt.compare(req.body.password, employeeData.password)) {
-                    console.log(generateToken(employeeData))
-                    res.status(200).send({ message: 'Logged in Successfully' })
+                    let obj = {
+                        empId: employeeData.empID,
+                        token: generateToken(employeeData),
+                        expiryOn: new Date(),
+                        createdAt: new Date(),
+                        updatedAt: new Date()
+                    }
+                    let tokenData = await tokenService.insert(obj)
+                    if (tokenData !== null)
+                        res.status(200).send({ message: 'Logged in Successfully', data: tokenData })
                 } else {
                     res.status(400).send({ message: 'Incorrect password' })
                 }
@@ -47,7 +55,6 @@ module.exports.login = async (req, res) => {
             res.status(400).send({ message: 'Email Not exist' })
         }
     } catch (error) {
-        console.log(error)
         if (error.name === "ValidationError")
             return res.status(500).send(error);
         else
@@ -120,7 +127,11 @@ module.exports.getEmployee = async (req, res) => {
     }
 }
 
-function generateToken(input){
+// module.exports.logout = async (req, res) =>{
+    
+// }
+
+function generateToken(input) {
     let jwtSecretKey = process.env.JWT_SECRET_KEY;
     let data = {
         time: Date(),
