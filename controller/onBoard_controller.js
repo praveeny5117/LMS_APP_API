@@ -127,9 +127,20 @@ module.exports.getEmployee = async (req, res) => {
     }
 }
 
-// module.exports.logout = async (req, res) =>{
-    
-// }
+module.exports.getSingleEmployee = async (req, res) => {
+    try {
+        let employeeData = await employeeService.findOne({empEmail:req.body.email});
+        if (employeeData !== null) {
+            res.status(200).send(employeeData)
+        } else
+            res.status(204).send('not exist')
+    } catch (error) {
+        if (error.name === "ValidationError")
+            return res.status(500).send(error);
+        else
+            return res.status(500).send(error);
+    }
+}
 
 function generateToken(input) {
     let jwtSecretKey = process.env.JWT_SECRET_KEY;
