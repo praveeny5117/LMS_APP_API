@@ -4,8 +4,12 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon server.js"
+    "serve": "nodemon server.js",
+    "cron": "nodemon cron_server.js",
+    "start": "concurrently \"npm:serve\" \"npm:cron\""
+  },
+  "devDependencies": {
+    "concurrently": "^5.3.0"
   },
   "author": "",
   "license": "ISC",
@@ -19,6 +23,8 @@
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^6.5.1",
     "morgan": "^1.10.0",
+    "node-cron": "^3.0.2",
+    "nodemailer": "^6.7.8",
     "nodemon": "^2.0.19"
   }
 }

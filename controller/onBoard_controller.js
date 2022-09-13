@@ -3,6 +3,7 @@ const tokenService = require('../service/token')
 const bcrypt = require("bcrypt");
 const jwt = require('jsonwebtoken');
 const dotenv = require('dotenv').config()
+const emailService = require('../email/emailService')
 
 module.exports.addEmployee = async (req, res) => {
     try {
@@ -31,6 +32,12 @@ module.exports.addEmployee = async (req, res) => {
 
 module.exports.login = async (req, res) => {
     try {
+    //     let obj = {
+    //         sub:'Hello',
+    //         content:'Hello Test',
+    //         toEmail:'praveeny@tangotech.co.in'
+    //     }
+    //    await emailService.sendEmail(obj)
         let employeeData = await employeeService.findOne({ empEmail: req.body.email });
         if (employeeData !== null) {
             if (employeeData.status == 'A') {
