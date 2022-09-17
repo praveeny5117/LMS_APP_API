@@ -32,12 +32,6 @@ module.exports.addEmployee = async (req, res) => {
 
 module.exports.login = async (req, res) => {
     try {
-    //     let obj = {
-    //         sub:'Hello',
-    //         content:'Hello Test',
-    //         toEmail:'praveeny@tangotech.co.in'
-    //     }
-    //    await emailService.sendEmail(obj)
         let employeeData = await employeeService.findOne({ empEmail: req.body.email });
         if (employeeData !== null) {
             if (employeeData.status == 'A') {
@@ -50,13 +44,20 @@ module.exports.login = async (req, res) => {
                         updatedAt: new Date()
                     }
                     let tokenData = await tokenService.insert(obj)
-                    if (tokenData !== null)
+                    if (tokenData !== null) {
+                        // let obj = {
+                        //     sub: 'Hello',
+                        //     content: 'Hello Test',
+                        //     toEmail: 'praveeny@tangotech.co.in'
+                        // }
+                        // await emailService.sendEmail(obj)
                         res.status(200).send({ message: 'Logged in Successfully', data: tokenData })
+                    }
                 } else {
                     res.status(400).send({ message: 'Incorrect password' })
                 }
             } else {
-                res.send({ message: "Account not activated Please activate your account" })
+                res.status(400).send({ message: "Account not activated Please activate your account" })
             }
         } else {
             res.status(400).send({ message: 'Email Not exist' })
@@ -136,7 +137,7 @@ module.exports.getEmployee = async (req, res) => {
 
 module.exports.getSingleEmployee = async (req, res) => {
     try {
-        let employeeData = await employeeService.findOne({empEmail:req.body.email});
+        let employeeData = await employeeService.findOne({ empEmail: req.body.email });
         if (employeeData !== null) {
             res.status(200).send(employeeData)
         } else
