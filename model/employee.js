@@ -20,8 +20,8 @@ var schema = new mongoose.Schema({
      role:{
         type:String,
         required:true,
-        enum:['user','admin'],
-        default:'user'
+        enum:['employee','hr','manager'],
+        default:'employee'
     },
     empEmail:{
         type:String,

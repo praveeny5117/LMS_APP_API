@@ -8,5 +8,6 @@ route.post('/getSingleEmployee',controller.getSingleEmployee)
 route.post('/login',controller.login)  
 route.post('/checkCode',controller.codeCheck)  
 route.post('/activate',controller.resetPassword)  
+route.get('/getmanagerlist',controller.getManagersList)  
 
 module.exports = route

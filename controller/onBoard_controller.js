@@ -158,3 +158,21 @@ function generateToken(input) {
     }
     return jwt.sign(data, jwtSecretKey);
 }
+
+module.exports.getManagersList = async (req, res) => {
+    try {
+        let query = { status: 'A', role: 'manager' }
+        let managersList = await employeeService.find(query);
+        if (!managersList.length) {
+            res.status(204).send('No Records Found!')
+            return
+        }
+        res.status(200).send(managersList)
+    } catch (error) {
+        if (error.name === "ValidationError")
+            return res.status(500).send(error);
+        else
+            return res.status(500).send(error);
+    }
+}
+
